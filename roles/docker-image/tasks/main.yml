@@ -1,0 +1,8 @@
+
+- include_vars:
+    dir: ../vars
+
+- name: docker pull images
+  shell: "docker pull {{ item.value.name }}; docker tag {{ item.value.name }} {{ item.value.target }};"
+  with_dict: "{{basic_images}}"
+

@@ -1,0 +1,41 @@
+
+- name: prepare some dirs
+  file: name={{ item }} state=directory
+  with_items:
+  - /tmp/kubedns
+  - /tmp/dashboard
+
+- name: copy kubedns ymls
+  template: src=kubedns/{{ item }} dest=/tmp/kubedns/{{ item }}
+  with_items:
+    - kubedns.yml
+
+- name: deploy kubedns
+  shell: kubectl apply -f /tmp/kubedns
+
+
+- name: copy dashboard-heapster ymls
+  template: src=dashboard-heapster/{{ item }} dest=/tmp/dashboard/{{ item }}
+  with_items:
+    - grafana.yaml
+    - heapster.yaml
+    - influxdb.yaml
+    - kubernetes-dashboard.yaml
+
+- name: deploy dashboard
+  shell: kubectl apply -f /tmp/dashboard/{{ item }}
+  with_items:
+    - grafana.yaml
+    - heapster.yaml
+    - influxdb.yaml
+    - kubernetes-dashboard.yaml
+  ignore_errors: true
+
+- name: deploy nginx cluster
+  template: src=nginxcluster.yaml dest=/tmp/nginxcluster.yaml
+
+- name: deploy nginx cluster
+  shell: kubectl apply -f /tmp/nginxcluster.yaml
+
+- name: recreate dashboard
+  shell: kubectl -n kube-system get pod |grep dashboard | awk '{print "kubectl -n kube-system delete pod "$1}' | bash

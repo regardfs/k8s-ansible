@@ -1,0 +1,9 @@
+down/*
+!down/download.sh
+bin/*
+!bin/VERSION.md
+#hosts
+ansible.log
+*.crt
+*.pem
+*.retry
